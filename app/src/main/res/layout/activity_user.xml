@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/iv_profileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_launcher_background" />
+
+        <EditText
+            android:id="@+id/et_profileUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/et_profileEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="E-mail"
+            android:inputType="textEmailAddress" />
+
+        <Button
+            android:id="@+id/btn_profileSaveInfo"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_buttons"
+            android:layout_margin="10dp"
+            android:backgroundTint="#42A5F5"
+            android:text="Save info"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/profile_signOut"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:onClick="logOut"
+            android:text="Sign out"
+            android:textColor="#EF5350" />
+
+    </LinearLayout>
+</RelativeLayout>
