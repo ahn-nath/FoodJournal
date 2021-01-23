@@ -55,5 +55,16 @@
             android:text="Sign out"
             android:textColor="#EF5350" />
 
+
+        <Button
+            android:id="@+id/btn_journals"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_buttons"
+            android:layout_margin="10dp"
+            android:backgroundTint="#42A5F5"
+            android:text="My Journals"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 </RelativeLayout>
