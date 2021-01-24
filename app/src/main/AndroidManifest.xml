@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodJournal">
         <activity
-            android:name=".SingleJournalActivity"
+            android:name=".NewJournalActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MyJournalsActivity"

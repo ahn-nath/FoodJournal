@@ -24,7 +24,7 @@ public class UserActivity extends AppCompatActivity {
         logOut = findViewById(R.id.profile_signOut);
         buttonJournals = findViewById(R.id.btn_journals);
 
-        // send to myJournals page if clicked
+        // send to myJournals page
         buttonJournals.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -36,7 +36,7 @@ public class UserActivity extends AppCompatActivity {
         });
     }
 
-    // log out user
+    //log out
     public void logOut(View view) {
         mAuth.signOut();
         startActivity(new Intent(this, MainActivity.class));
