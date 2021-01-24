@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+<<<<<<< HEAD
     tools:context=".NewJournalActivity">
 
     <Button
@@ -32,6 +33,9 @@
         android:layout_marginBottom="16dp" />
 
 
+=======
+    tools:context=".SingleJournalActivity">
+>>>>>>> parent of 8cc3193... Revert "Update product functionality, comment code"
     <EditText
         android:id="@+id/edit_text_title"
         android:layout_width="match_parent"
