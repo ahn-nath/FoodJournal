@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -30,7 +31,7 @@ public class MyJournalsActivity extends AppCompatActivity {
         buttonAddJournal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), NewJournalActivity.class));
+                startActivity(new Intent(getApplicationContext(), SingleJournalActivity.class));
             }
         });
 
@@ -62,6 +63,25 @@ public class MyJournalsActivity extends AppCompatActivity {
                 adapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }).attachToRecyclerView(recyclerView);
+
+        //get document reference after clicking on element
+        adapter.setOnItemClickListener(new JournalAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+                Journal journal = documentSnapshot.toObject(Journal.class);
+                String id = documentSnapshot.getId();
+                String path = documentSnapshot.getReference().getPath();
+
+
+                Toast.makeText(getApplicationContext(),
+                        "Position: " + position + " ID: " + id, Toast.LENGTH_SHORT).show();
+
+                // send doc reference to SingleJournalActivity to update document
+                Intent intent = new Intent(getApplicationContext(), SingleJournalActivity.class);
+                intent.putExtra("path", path);
+                startActivity(intent);
+            }
+        });
     }
 
     // final setup

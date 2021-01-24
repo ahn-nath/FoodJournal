@@ -3,20 +3,24 @@ package com.example.foodjournal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 
 public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAdapter.JournalHolder> {
+    private OnItemClickListener listener;
+
     public JournalAdapter(FirestoreRecyclerOptions<Journal> options) {
         super(options);
     }
 
-    // set/arrange views in main view to info received from instance variables
+    // set/arrange views in main view according to retrieved values from Journal object
     @Override
     protected void onBindViewHolder(JournalHolder holder, int position, Journal model) {
         holder.textViewTitle.setText(model.getTitle());
@@ -33,12 +37,13 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
         return new JournalHolder(v);
     }
 
+    // delete item in position 'position'
     public void deleteItem(int position) {
         getSnapshots().getSnapshot(position).getReference().delete();
     }
 
     class JournalHolder extends RecyclerView.ViewHolder {
-        // relevant views
+        // define relevant views
         TextView textViewTitle;
         TextView textViewDescription;
         TextView textViewPriority;
@@ -50,6 +55,26 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDescription = itemView.findViewById(R.id.text_view_description);
             textViewPriority = itemView.findViewById(R.id.text_view_priority);
+
+            // set on click listener to get position of particular item
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && listener != null) {
+                        listener.onItemClick(getSnapshots().getSnapshot(position), position);
+                    }
+                }
+            });
+
         }
+    }
+
+    //method to send the document reference
+    public interface OnItemClickListener {
+        void onItemClick(DocumentSnapshot documentSnapshot, int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }
