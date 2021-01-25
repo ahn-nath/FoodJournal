@@ -2,13 +2,20 @@ package com.example.foodjournal;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,14 +24,26 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
+
 
 public class SingleJournalActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_REQUEST = 1;
+
     private FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private DocumentReference docRef;
+
+
     boolean update = false;
     private EditText editTextTitle;
     private EditText editTextDescription;
     private NumberPicker numberPickerPriority;
+    private Button mButtonChooseImage;
+    private Button mButtonUpload;
+    private ImageView mImageView;
+    private ProgressBar mProgressBar;
+
+    private Uri mImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +54,15 @@ public class SingleJournalActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Add Journal");
 
+        // links elements to views
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         numberPickerPriority = findViewById(R.id.number_picker_priority);
+        mButtonChooseImage = findViewById(R.id.button_choose_image);
+        mButtonUpload = findViewById(R.id.button_upload);
+        mImageView = findViewById(R.id.image_view);
+        mProgressBar = findViewById(R.id.progress_bar);
+
         numberPickerPriority.setMinValue(1);
         numberPickerPriority.setMaxValue(4);
 
@@ -54,7 +79,17 @@ public class SingleJournalActivity extends AppCompatActivity {
             getDocumentData(docRef);
         }
 
+
+        mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser();
+            }
+        });
+
     }
+
+
     // inflate menu [new_journal_menu]
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -96,6 +131,36 @@ public class SingleJournalActivity extends AppCompatActivity {
                 });
     }
 
+    // to pick image
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    // set ImageView to picked image
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // if user picked an image
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+
+            //get data and set imageView to image
+            mImageUri = data.getData();
+            Picasso.get().load(mImageUri).into(mImageView);
+        }
+    }
+
+    // get extension file [image]
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
 
     // create or update journal
     private void saveJournal() {
@@ -123,7 +188,7 @@ public class SingleJournalActivity extends AppCompatActivity {
             // create new journal
             CollectionReference notebookRef = FirebaseFirestore.getInstance()
                     .collection("Journal");
-            notebookRef.add(new Journal(title, description, priority));
+            notebookRef.add(new Journal(null, title, description, priority));
 
             Toast.makeText(this, "Journal added", Toast.LENGTH_SHORT).show();
             finish();
