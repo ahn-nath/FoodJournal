@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,19 +20,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
 public class SingleJournalActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private FirebaseFirestore mStore = FirebaseFirestore.getInstance();
+    private FirebaseFirestore mStore;
     private DocumentReference docRef;
+    private StorageReference mStorageRef;
+    private StorageTask mUploadTask;
 
 
     boolean update = false;
@@ -49,6 +58,9 @@ public class SingleJournalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_journal);
+
+        mStore = FirebaseFirestore.getInstance();
+        mStorageRef = FirebaseStorage.getInstance().getReference("uploads");
 
         // set header title
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
@@ -161,6 +173,51 @@ public class SingleJournalActivity extends AppCompatActivity {
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
+    private String uploadFile() {
+
+            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
+
+            mUploadTask = fileReference.putFile(mImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mProgressBar.setProgress(0);
+                                }
+                            }, 500);
+
+
+                            //image file to send
+                            String imgFile = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                            Toast.makeText(getApplicationContext(), "Upload successful: " + imgFile, Toast.LENGTH_LONG).show();
+                            // create new notebook
+
+                        }
+
+
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            mProgressBar.setProgress((int) progress);
+                        }
+                    });
+
+        return null;
+    }
+
 
     // create or update journal
     private void saveJournal() {
@@ -168,6 +225,15 @@ public class SingleJournalActivity extends AppCompatActivity {
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
         int priority = numberPickerPriority.getValue();
+
+        // check if image file was selected
+        if (mImageUri != null) {
+            uploadFile(); // -- use to create new notebook
+        }else{
+            Toast.makeText(this, "Please select image file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         // verify values are not empty/null
         if (title.trim().isEmpty() || description.trim().isEmpty()) {
@@ -186,9 +252,11 @@ public class SingleJournalActivity extends AppCompatActivity {
 
         else {
             // create new journal
+            // call upload file method
+
             CollectionReference notebookRef = FirebaseFirestore.getInstance()
                     .collection("Journal");
-            notebookRef.add(new Journal(null, title, description, priority));
+            notebookRef.add(new Journal("null", title, description, priority));
 
             Toast.makeText(this, "Journal added", Toast.LENGTH_SHORT).show();
             finish();
