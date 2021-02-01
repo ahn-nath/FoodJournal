@@ -10,12 +10,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodJournal">
+        <activity android:name=".HomeActivity"></activity>
         <activity
             android:name=".SingleJournalActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MyJournalsActivity"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
         <activity android:name=".UserActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

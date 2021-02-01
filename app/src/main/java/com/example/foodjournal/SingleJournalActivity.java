@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -173,7 +174,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
-    private String uploadFile() {
+    private void uploadFile(String title, String description, int priority) {
 
             StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
@@ -182,6 +183,7 @@ public class SingleJournalActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // progress bar with delay
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -191,10 +193,24 @@ public class SingleJournalActivity extends AppCompatActivity {
                             }, 500);
 
 
-                            //image file to send
-                            String imgFile = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                            Toast.makeText(getApplicationContext(), "Upload successful: " + imgFile, Toast.LENGTH_LONG).show();
-                            // create new notebook
+                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String imgUrl = uri.toString();
+                                    if(uri.toString() == null){
+                                        imgUrl = "it is null";
+                                        
+                                    }
+
+                                    // create new notebook
+                                    CollectionReference notebookRef = FirebaseFirestore.getInstance()
+                                            .collection("Journal");
+                                    notebookRef.add(new Journal(imgUrl, title, description, priority));
+                                }
+                            });
+
+                            Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
+                            finish();
 
                         }
 
@@ -215,7 +231,6 @@ public class SingleJournalActivity extends AppCompatActivity {
                         }
                     });
 
-        return null;
     }
 
 
@@ -227,13 +242,10 @@ public class SingleJournalActivity extends AppCompatActivity {
         int priority = numberPickerPriority.getValue();
 
         // check if image file was selected
-        if (mImageUri != null) {
-            uploadFile(); // -- use to create new notebook
-        }else{
+        if (mImageUri == null) {
             Toast.makeText(this, "Please select image file", Toast.LENGTH_SHORT).show();
             return;
         }
-
 
         // verify values are not empty/null
         if (title.trim().isEmpty() || description.trim().isEmpty()) {
@@ -253,13 +265,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         else {
             // create new journal
             // call upload file method
-
-            CollectionReference notebookRef = FirebaseFirestore.getInstance()
-                    .collection("Journal");
-            notebookRef.add(new Journal("null", title, description, priority));
-
-            Toast.makeText(this, "Journal added", Toast.LENGTH_SHORT).show();
-            finish();
+            uploadFile(title, description, priority);
         }
     }
 }
