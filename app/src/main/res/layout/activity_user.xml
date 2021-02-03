@@ -21,20 +21,20 @@
             android:layout_marginBottom="30dp"
             android:src="@drawable/ic_launcher_background" />
 
-        <EditText
-            android:id="@+id/et_profileUsername"
+        <TextView
+            android:id="@+id/profileUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_margin="10dp"
             android:fontFamily="sans-serif-condensed"
             android:hint="Username"
             android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/et_profileEmail"
+        <TextView
+            android:id="@+id/profileEmail"
             android:layout_width="match_parent"
+            android:layout_margin="10dp"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:fontFamily="sans-serif-condensed"
             android:hint="E-mail"
             android:layout_marginBottom="30dp"

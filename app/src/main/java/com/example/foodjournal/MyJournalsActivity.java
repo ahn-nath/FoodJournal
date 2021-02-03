@@ -75,7 +75,7 @@ public class MyJournalsActivity extends AppCompatActivity {
             }
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                Toast.makeText(getApplicationContext(), "director:" + direction, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Journal deleted", Toast.LENGTH_LONG).show();
                 adapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }).attachToRecyclerView(recyclerView);

@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@android:color/darker_gray">
+    tools:context=".MainActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_centerInParent="true"
-        app:cardCornerRadius="10dp"
-        >
+        android:layout_centerInParent="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,9 +26,8 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_margin="10dp"
+                android:layout_marginBottom="30dp"
                 android:src="@drawable/ic_launcher_background" />
-
-
 
             <EditText
                 android:id="@+id/et_emailLogin"
@@ -40,8 +35,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
                 android:layout_margin="10dp"
-                android:background="@drawable/round_buttons"
-                android:backgroundTint="#F2F2F2"
                 android:hint="E-mail"
                 android:inputType="textEmailAddress"
                 android:padding="10dp" />
@@ -52,10 +45,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:fontFamily="sans-serif-condensed"
-                android:background="@drawable/round_buttons"
-                android:backgroundTint="#F2F2F2"
                 android:hint="Password"
                 android:inputType="textPassword"
+                android:layout_marginBottom="30dp"
                 android:padding="10dp" />
 
             <LinearLayout
@@ -70,7 +62,6 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/round_buttons"
                     android:backgroundTint="@color/purple_700"
                     android:onClick="userAuth"
                     android:text="Sign up"
@@ -82,7 +73,6 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/round_buttons"
                     android:backgroundTint="@color/teal_700"
                     android:onClick="userAuth"
                     android:text="Login"
