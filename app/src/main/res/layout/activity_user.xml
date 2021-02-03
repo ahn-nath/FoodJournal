@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="20dp"
     tools:context=".UserActivity">
 
     <LinearLayout
@@ -17,6 +18,7 @@
             android:id="@+id/iv_profileImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_marginBottom="30dp"
             android:src="@drawable/ic_launcher_background" />
 
         <EditText
@@ -24,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:fontFamily="sans-serif-condensed"
             android:hint="Username"
             android:inputType="textPersonName" />
 
@@ -32,39 +35,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:fontFamily="sans-serif-condensed"
             android:hint="E-mail"
+            android:layout_marginBottom="30dp"
             android:inputType="textEmailAddress" />
-
-        <Button
-            android:id="@+id/btn_profileSaveInfo"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/round_buttons"
-            android:layout_margin="10dp"
-            android:backgroundTint="#42A5F5"
-            android:text="Save info"
-            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/profile_signOut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:onClick="logOut"
             android:text="Sign out"
-            android:textColor="#EF5350" />
+            android:textColor="#EF5350"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
 
         <Button
             android:id="@+id/btn_journals"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/round_buttons"
             android:layout_margin="10dp"
-            android:backgroundTint="#42A5F5"
-            android:text="My Journals"
-            android:textColor="@android:color/white" />
+            android:fontFamily="sans-serif-medium"
+            android:text="My Journals" />
 
     </LinearLayout>
 </RelativeLayout>

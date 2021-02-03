@@ -17,7 +17,10 @@
         <activity
             android:name=".MyJournalsActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".UserActivity" />
+        <activity
+            android:name=".UserActivity"
+            android:parentActivityName=".HomeActivity"/>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

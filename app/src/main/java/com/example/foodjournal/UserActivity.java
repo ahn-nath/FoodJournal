@@ -24,12 +24,16 @@ public class UserActivity extends AppCompatActivity {
         logOut = findViewById(R.id.profile_signOut);
         buttonJournals = findViewById(R.id.btn_journals);
 
+        // set header title
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        setTitle("User Profile");
+
         // send to myJournals page if clicked
         buttonJournals.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                Toast.makeText(UserActivity.this, "Button Clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserActivity.this, "All Journals", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(getApplicationContext(), MyJournalsActivity.class));
             }
 

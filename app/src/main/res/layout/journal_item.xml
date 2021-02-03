@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    app:cardBackgroundColor="#E1FFFFFF">
+    android:layout_marginEnd="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:padding="8dp">
 
         <ImageView
@@ -19,7 +16,7 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_marginRight="15dp"
-            android:background="#009688" />
+            android:background="#AFAFAF" />
 
         <TextView
             android:id="@+id/text_view_title"
@@ -27,18 +24,9 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/image_view_journal"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:text="Title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/text_view_priority"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
@@ -47,7 +35,19 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/text_view_title"
             android:layout_toRightOf="@id/image_view_journal"
+            android:fontFamily="sans-serif-condensed"
             android:text="Description" />
+
+        <TextView
+            android:id="@+id/text_view_date"
+            android:layout_width="wrap_content"
+            android:textColor="@color/teal_200"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/image_view_journal"
+            android:layout_toRightOf="@id/image_view_journal"
+            android:fontFamily="sans-serif-medium"
+            android:text="DD/MM/YY" />
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

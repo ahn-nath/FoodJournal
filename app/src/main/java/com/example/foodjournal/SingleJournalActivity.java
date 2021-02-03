@@ -1,10 +1,12 @@
 package com.example.foodjournal;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -60,6 +62,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_journal);
 
+        // Firebase instances
         mStore = FirebaseFirestore.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference("uploads");
 
@@ -76,6 +79,15 @@ public class SingleJournalActivity extends AppCompatActivity {
         mImageView = findViewById(R.id.image_view);
         mProgressBar = findViewById(R.id.progress_bar);
 
+
+        // set NumberPicker values
+        String[] categories = { //shall this go here, don't think so
+                "Brunch/Breakfast",
+                "Lunch",
+                "Dinner",
+                "Snack"
+        };
+        numberPickerPriority.setDisplayedValues(categories);
         numberPickerPriority.setMinValue(1);
         numberPickerPriority.setMaxValue(4);
 
@@ -112,6 +124,7 @@ public class SingleJournalActivity extends AppCompatActivity {
     }
 
     // if someone clicks on save_journal item in menu, call saveJournal()
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -174,7 +187,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
-    private void uploadFile(String title, String description, int priority) {
+    private void uploadFile(String title, String description, int priority, String date) {
 
             StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
@@ -205,7 +218,7 @@ public class SingleJournalActivity extends AppCompatActivity {
                                     // create new notebook
                                     CollectionReference notebookRef = FirebaseFirestore.getInstance()
                                             .collection("Journal");
-                                    notebookRef.add(new Journal(imgUrl, title, description, priority));
+                                    notebookRef.add(new Journal(imgUrl, title, description, priority, date));
                                 }
                             });
 
@@ -235,10 +248,15 @@ public class SingleJournalActivity extends AppCompatActivity {
 
 
     // create or update journal
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void saveJournal() {
+        // show message
+        Toast.makeText(this, "Uploading file...", Toast.LENGTH_LONG).show();
+
         // get input values
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
+        String date = java.time.LocalDate.now().toString();
         int priority = numberPickerPriority.getValue();
 
         // check if image file was selected
@@ -265,7 +283,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         else {
             // create new journal
             // call upload file method
-            uploadFile(title, description, priority);
+            uploadFile(title, description, priority, date);
         }
     }
 }

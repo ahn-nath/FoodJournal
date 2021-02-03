@@ -27,7 +27,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
     protected void onBindViewHolder(JournalHolder holder, int position, Journal model) {
         holder.textViewTitle.setText(model.getTitle());
         holder.textViewDescription.setText(model.getDescription());
-        holder.textViewPriority.setText(String.valueOf(model.getPriority()));
+        holder.textViewDate.setText(model.getDate());
 
         Picasso.get()
                 .load(model.getImage())
@@ -58,7 +58,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
         // define relevant views
         TextView textViewTitle;
         TextView textViewDescription;
-        TextView textViewPriority;
+        TextView textViewDate;
         ImageView imageViewJournal;
 
 
@@ -67,7 +67,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
             // connect objects to views in XML layout
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDescription = itemView.findViewById(R.id.text_view_description);
-            textViewPriority = itemView.findViewById(R.id.text_view_priority);
+            textViewDate = itemView.findViewById(R.id.text_view_date);
             imageViewJournal = itemView.findViewById(R.id.image_view_journal);
 
             // set on click listener to get position of particular item
