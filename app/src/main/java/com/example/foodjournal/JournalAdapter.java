@@ -3,12 +3,11 @@ package com.example.foodjournal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -16,12 +15,9 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
-import static java.security.AccessController.getContext;
-
 
 public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAdapter.JournalHolder> {
     private OnItemClickListener listener;
-    private int count = -1;
 
     public JournalAdapter(FirestoreRecyclerOptions<Journal> options) {
         super(options);
@@ -44,6 +40,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
     }
 
     //layout to inflate
+    @NonNull
     @Override
     public JournalHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.journal_item,
@@ -74,13 +71,10 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
             emptyLayout = itemView.findViewById(R.id.emptyLayout);
 
             // set on click listener to get position of particular item
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION && listener != null) {
-                        listener.onItemClick(getSnapshots().getSnapshot(position), position);
-                    }
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onItemClick(getSnapshots().getSnapshot(position), position);
                 }
             });
 
@@ -91,6 +85,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
     public interface OnItemClickListener {
         void onItemClick(DocumentSnapshot documentSnapshot, int position);
     }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }

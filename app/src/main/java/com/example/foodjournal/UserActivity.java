@@ -1,7 +1,5 @@
 package com.example.foodjournal;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,15 +7,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
     private String userId;
     TextView profileUsername;
     TextView profileEmail;
@@ -29,7 +26,7 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
+        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
         profileEmail = findViewById(R.id.profileEmail);
         profileUsername = findViewById(R.id.profileUsername);
         logOut = findViewById(R.id.profile_signOut);
@@ -45,19 +42,14 @@ public class UserActivity extends AppCompatActivity {
         getUserData(documentReference);
 
         // send to myJournals page if clicked
-        buttonJournals.setOnClickListener(new View.OnClickListener() {
+        buttonJournals.setOnClickListener(view -> {
+            Toast.makeText(UserActivity.this, "All Journals", Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(UserActivity.this, "All Journals", Toast.LENGTH_SHORT).show();
-
-                // send to My Journals activity
-                Intent intent = new Intent(getApplicationContext(), MyJournalsActivity.class);
-                intent.putExtra("userId", userId);
-                startActivity(intent);
-                startActivity(new Intent(getApplicationContext(), MyJournalsActivity.class));
-            }
-
+            // send to My Journals activity
+            Intent intent = new Intent(getApplicationContext(), MyJournalsActivity.class);
+            intent.putExtra("userId", userId);
+            startActivity(intent);
+            startActivity(new Intent(getApplicationContext(), MyJournalsActivity.class));
         });
     }
 
@@ -73,17 +65,14 @@ public class UserActivity extends AppCompatActivity {
 
     private void getUserData(DocumentReference docRef) {
         docRef.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            String email = documentSnapshot.getString("email");
-                            String username = documentSnapshot.getString("username");
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String email = documentSnapshot.getString("email");
+                        String username = documentSnapshot.getString("username");
 
-                            // set values to TextView elements
-                            profileEmail.setText(email);
-                            profileUsername.setText(username);
-                        }
+                        // set values to TextView elements
+                        profileEmail.setText(email);
+                        profileUsername.setText(username);
                     }
                 });
     }

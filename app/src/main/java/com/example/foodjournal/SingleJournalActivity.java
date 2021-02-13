@@ -1,15 +1,12 @@
 package com.example.foodjournal;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,19 +21,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
@@ -48,17 +43,14 @@ public class SingleJournalActivity extends AppCompatActivity {
     private DocumentReference docRef;
     FirebaseUser currentUser;
     private StorageReference mStorageRef;
-    private StorageTask mUploadTask;
 
 
     boolean update = false;
     private EditText editTextTitle;
     private EditText editTextDescription;
     private NumberPicker numberPickerPriority;
-    private Button mButtonChooseImage;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
-    private LinearLayout layoutImageSet;
 
     private Uri mImageUri;
 
@@ -80,8 +72,8 @@ public class SingleJournalActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         numberPickerPriority = findViewById(R.id.number_picker_priority);
-        layoutImageSet = findViewById(R.id.layoutImageSet);
-        mButtonChooseImage = findViewById(R.id.button_choose_image);
+        LinearLayout layoutImageSet = findViewById(R.id.layoutImageSet);
+        Button mButtonChooseImage = findViewById(R.id.button_choose_image);
         mImageView = findViewById(R.id.image_view);
         mProgressBar = findViewById(R.id.progress_bar);
 
@@ -104,7 +96,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         } else {
             //if the category was specified, set default
             categories = new String[1];
-            categories[0] = categoriesList[category-1       ];
+            categories[0] = categoriesList[category - 1];
         }
 
         numberPickerPriority.setDisplayedValues(categories);
@@ -125,12 +117,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         }
 
 
-        mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openFileChooser();
-            }
-        });
+        mButtonChooseImage.setOnClickListener(v -> openFileChooser());
 
     }
 
@@ -144,17 +131,15 @@ public class SingleJournalActivity extends AppCompatActivity {
     }
 
     // if someone clicks on save_journal item in menu, call saveJournal()
+    @SuppressLint("NonConstantResourceId")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_journal:
-                saveJournal();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.save_journal) {
+            saveJournal();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -167,18 +152,15 @@ public class SingleJournalActivity extends AppCompatActivity {
     private void getDocumentData(DocumentReference docRef) {
 
         docRef.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("title");
-                            String description = documentSnapshot.getString("description");
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("title");
+                        String description = documentSnapshot.getString("description");
 
-                            //set EditText elements to values in document
-                            editTextTitle .setText(name, TextView.BufferType.EDITABLE);
-                            editTextDescription.setText(description, TextView.BufferType.EDITABLE);
+                        //set EditText elements to values in document
+                        editTextTitle.setText(name, TextView.BufferType.EDITABLE);
+                        editTextDescription.setText(description, TextView.BufferType.EDITABLE);
 
-                        }
                     }
                 });
     }
@@ -215,61 +197,41 @@ public class SingleJournalActivity extends AppCompatActivity {
 
     private void uploadFile(String title, String description, int priority, String date) {
 
-            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                    + "." + getFileExtension(mImageUri));
+        StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                + "." + getFileExtension(mImageUri));
 
-            mUploadTask = fileReference.putFile(mImageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // progress bar with delay
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mProgressBar.setProgress(0);
-                                }
-                            }, 500);
+        // progress bar with delay
+        // create new notebook
+        StorageTask mUploadTask = fileReference.putFile(mImageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // progress bar with delay
+                    Handler handler = new Handler();
+                    handler.postDelayed(() -> mProgressBar.setProgress(0), 500);
 
 
-                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    String imgUrl = uri.toString();
-                                    if(uri.toString() == null){
-                                        imgUrl = "it is null";
-                                        
-                                    }
-
-                                    // create new notebook
-                                    CollectionReference notebookRef = mStore
-                                            .collection("Journal").document(currentUser.getUid()).collection("Journals");
-
-                                    notebookRef.add(new Journal(imgUrl, title, description, priority, date));
-                                }
-                            });
-
-                            Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
-                            finish();
+                    fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imgUrl = uri.toString();
+                        if (uri.toString() == null) {
+                            imgUrl = "it is null";
 
                         }
 
+                        // create new notebook
+                        CollectionReference notebookRef = mStore
+                                .collection("Journal").document(currentUser.getUid()).collection("Journals");
 
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            mProgressBar.setProgress((int) progress);
-                        }
+                        notebookRef.add(new Journal(imgUrl, title, description, priority, date));
                     });
+
+                    Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
+                    finish();
+
+                })
+                .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show())
+                .addOnProgressListener(taskSnapshot -> {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    mProgressBar.setProgress((int) progress);
+                });
 
     }
 
@@ -305,9 +267,7 @@ public class SingleJournalActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Journal updated", Toast.LENGTH_SHORT).show();
             finish();
-        }
-
-        else {
+        } else {
             // create new journal
             // call upload file method
             uploadFile(title, description, priority, date);

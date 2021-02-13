@@ -1,8 +1,9 @@
 package com.example.foodjournal;
 
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,11 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -67,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // register or log in
+    @SuppressLint("NonConstantResourceId")
     public void userAuth(View view) {
         final  String email = userEmail.getText().toString();
         String password = userPassword.getText().toString();
@@ -89,70 +86,56 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_register:
 
                 mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(this, task -> {
 
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success");
+                                FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Log.d(TAG, "signInWithEmail:success");
-                                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                                //Create user and add custom fields to database
+                                userId = mAuth.getCurrentUser().getUid();
+                                // get username part from email address
+                                int index = email.indexOf('@');
+                                String username = email.substring(0, index);
 
-                                    //Create user and add custom fields to database
-                                    userId = mAuth.getCurrentUser().getUid();
-                                    // get username part from email address
-                                    int index = email.indexOf('@');
-                                    String username = email.substring(0, index);
+                                // Create Journal collection for user
+                                DocumentReference docReference = mStore.collection("Journal").document(userId);
+                                Map<String, Object> userJournal = new HashMap<>();
+                                userJournal.put("email", email);
+                                userJournal.put("username", username);
 
-                                    // Create Journal collection for user
-                                    DocumentReference docReference = mStore.collection("Journal").document(userId);
-                                    Map<String, Object> userJournal = new HashMap<>();
-                                    userJournal.put("email", email);
-                                    userJournal.put("username", username);
-
-                                    docReference.set(userJournal)
-                                            .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
+                                docReference.set(userJournal)
+                                        .addOnFailureListener(e -> {
                                             // trace error
                                              Log.d("ERROR CREATING JOURNAL", task.getException().getMessage());
-                                        }
-                                    });
+                                        });
 
-                                    // Users collection
-                                    DocumentReference documentReference = mStore.collection("Users").document(userId);
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("email", email);
-                                    user.put("username", username);
+                                // Users collection
+                                DocumentReference documentReference = mStore.collection("Users").document(userId);
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", email);
+                                user.put("username", username);
 
-                                    documentReference.set(user)
+                                documentReference.set(user)
 
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(getApplicationContext(), "User registered.",
-                                                            Toast.LENGTH_LONG).show();
-                                                    updateUI(currentUser); //send to UserActivity
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(getApplicationContext(), "User registered.",
+                                                    Toast.LENGTH_LONG).show();
+                                            updateUI(currentUser); //send to UserActivity
 
-                                                }})
+                                        })
 
-                                            .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getApplicationContext(), "There's was a problem while trying to register" + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                        .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "There's was a problem while trying to register" + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show());
 
-                                    // problem while registering
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(MainActivity.this, "Failed to register. " + task.getException(),
-                                            Toast.LENGTH_SHORT).show();
+                                // problem while registering
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                Toast.makeText(MainActivity.this, "Failed to register. " + task.getException(),
+                                        Toast.LENGTH_SHORT).show();
 
-                                    updateUI(null);
-                                }
+                                updateUI(null);
                             }
                         });
                 break;
@@ -160,28 +143,24 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_login:
 
                 mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(this, task -> {
 
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success");
+                                FirebaseUser currentUser = mAuth.getCurrentUser();
+                                Toast.makeText(MainActivity.this, "User logged in",
+                                        Toast.LENGTH_LONG).show();
 
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Log.d(TAG, "signInWithEmail:success");
-                                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                                    Toast.makeText(MainActivity.this, "User logged in",
-                                            Toast.LENGTH_LONG).show();
+                                updateUI(currentUser); //send to UserActivity
 
-                                    updateUI(currentUser); //send to UserActivity
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                Toast.makeText(MainActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_LONG).show();
 
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(MainActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_LONG).show();
-
-                                    updateUI(null);
-                                }
+                                updateUI(null);
                             }
                         });
                 break;

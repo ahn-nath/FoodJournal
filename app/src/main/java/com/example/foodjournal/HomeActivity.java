@@ -3,6 +3,7 @@ package com.example.foodjournal;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,7 +13,6 @@ import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -44,14 +44,12 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.profile:
-                startActivity(new Intent(getApplicationContext(), UserActivity.class));
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        // if user clicked on 'user profile' icon
+        if (item.getItemId() == R.id.profile) {
+            startActivity(new Intent(getApplicationContext(), UserActivity.class));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -61,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // choose journal category
+    @SuppressLint("NonConstantResourceId")
     public void mealCategory(View view) {
         int category = -1;
         Intent intent;

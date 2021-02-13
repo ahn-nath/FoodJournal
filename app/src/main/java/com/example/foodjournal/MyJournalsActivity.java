@@ -1,5 +1,6 @@
 package com.example.foodjournal;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,27 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 public class MyJournalsActivity extends AppCompatActivity {
-    private static final String TAG = "DEBUG";
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore mStore;
-    private CollectionReference notebookRef;
-    private Query queryReference;
     private JournalAdapter adapter;
     private int category;
     LinearLayout emptyLayout;
@@ -40,9 +31,8 @@ public class MyJournalsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_journals);
 
         // Firebase
-        mAuth = FirebaseAuth.getInstance();
-        mStore = FirebaseFirestore.getInstance();
-        notebookRef = mStore.collection("Journal");
+        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
+        CollectionReference notebookRef = mStore.collection("Journal");
 
         // link views
         emptyLayout = findViewById(R.id.emptyLayout);
@@ -53,12 +43,14 @@ public class MyJournalsActivity extends AppCompatActivity {
         setTitle("Journals");
 
 
-        //get extra intent from Main Activity to determine what products to show
+        //get extra intent from Main Activity to determine what filter to use with query [category]
         Intent intent = getIntent();
         category = intent.getIntExtra("category", -1);
-        String id =  intent.getStringExtra("userId");
+        String id = intent.getStringExtra("userId");
+
+        Query queryReference;
         if (category == -1) {
-            //if the category of the journal was not specified [-1], show all journal by user
+            //if the category of the journal was not specified [-1], show all journals by user
             queryReference = notebookRef.document(id)
                     .collection("Journals");
         } else {
@@ -70,14 +62,11 @@ public class MyJournalsActivity extends AppCompatActivity {
 
         // add listener to button for adding a new journal
         FloatingActionButton buttonAddJournal = findViewById(R.id.button_add_journal);
-        buttonAddJournal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // send to single journal with category
-                Intent intent = new Intent(getApplicationContext(), SingleJournalActivity.class);
-                intent.putExtra("category", category);
-                startActivity(intent);
-            }
+        buttonAddJournal.setOnClickListener(v -> {
+            // send to single journal with category
+            Intent intent1 = new Intent(getApplicationContext(), SingleJournalActivity.class);
+            intent1.putExtra("category", category);
+            startActivity(intent1);
         });
 
         // RecyclerView with all journals from database
@@ -100,32 +89,29 @@ public class MyJournalsActivity extends AppCompatActivity {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
+
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 Toast.makeText(getApplicationContext(), "Journal deleted", Toast.LENGTH_LONG).show();
                 adapter.deleteItem(viewHolder.getAdapterPosition());
             }
         }).attachToRecyclerView(recyclerView);
 
-        //get document reference after clicking on element
-        adapter.setOnItemClickListener(new JournalAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                String id = documentSnapshot.getId();
-                String path = documentSnapshot.getReference().getPath();
+        //get document reference after clicking on element to update
+        adapter.setOnItemClickListener((documentSnapshot, position) -> {
+            String path = documentSnapshot.getReference().getPath();
 
-                Toast.makeText(getApplicationContext(),
-                        "Update Journal", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),
+                    "Update Journal", Toast.LENGTH_SHORT).show();
 
-                // send doc reference to SingleJournalActivity to update document
-                Intent intent = new Intent(getApplicationContext(), SingleJournalActivity.class);
-                intent.putExtra("path", path);
-                intent.putExtra("category", category);
-                startActivity(intent);
-            }
+            // send doc reference to SingleJournalActivity to update document
+            Intent intent = new Intent(getApplicationContext(), SingleJournalActivity.class);
+            intent.putExtra("path", path);
+            intent.putExtra("category", category);
+            startActivity(intent);
         });
     }
 
@@ -135,6 +121,7 @@ public class MyJournalsActivity extends AppCompatActivity {
         super.onStart();
         adapter.startListening();
     }
+
     @Override
     protected void onStop() {
         super.onStop();
