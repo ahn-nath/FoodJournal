@@ -10,16 +10,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_weight=".4"
+        android:layout_weight=".3"
         android:background="#00FFFFFF"
         android:backgroundTint="#00FFFFFF"
         android:orientation="vertical">
 
 
-        <androidx.cardview.widget.CardView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:cardBackgroundColor="#00FFFFFF">
+            android:layout_height="match_parent">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -34,15 +33,17 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="bottom"
-                android:layout_margin="30dp"
-                android:layout_marginVertical="25dp"
+                android:layout_alignParentStart="true"
                 android:fontFamily="sans-serif-condensed-light"
                 android:paddingHorizontal="10dp"
+                android:layout_marginVertical="5dp"
+                android:layout_marginHorizontal="15dp"
                 android:shadowColor="#9F3A3A3A"
                 android:shadowDx="14"
                 android:shadowDy="14"
                 android:shadowRadius="10"
-                android:text="My Journals"
+                android:text="Hello,"
+                android:layout_above="@id/text_view_sub"
                 android:textColor="#fff"
                 android:textFontWeight="900"
                 android:textSize="30sp" />
@@ -52,20 +53,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_margin="30dp"
-                android:layout_marginVertical="25dp"
                 android:fontFamily="sans-serif-condensed-light"
                 android:paddingHorizontal="10dp"
                 android:shadowColor="#9F3A3A3A"
                 android:shadowDx="14"
                 android:shadowDy="14"
+                android:layout_marginBottom="25dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_alignParentStart="true"
                 android:shadowRadius="10"
-                android:text="My Journals"
+                android:text="What are we going to eat today?"
+                android:layout_alignParentBottom="true"
                 android:textColor="#fff"
-                android:textFontWeight="900"
                 android:textSize="20sp" />
 
-        </androidx.cardview.widget.CardView>
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -76,7 +78,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginVertical="10dp"
         android:layout_marginTop="10dp"
-        android:layout_weight=".6"
+        android:layout_weight=".7"
         android:columnCount="2"
         android:rowCount="2">
 
@@ -104,7 +106,7 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="130dp"
                     android:layout_weight="0.6"
                     android:scaleType="centerCrop"
                     android:src="@drawable/brunch" />
@@ -145,10 +147,10 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="130dp"
                     android:layout_weight="0.6"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/brunch" />
+                    android:src="@drawable/lunch" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -157,9 +159,9 @@
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:paddingStart="15dp"
-                    android:text="brunch "
-                    android:textAllCaps="true"
-                    android:textStyle="bold" />
+                    android:text="lunch"
+                    android:textStyle="bold"
+                    android:textAllCaps="true" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -186,10 +188,10 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="130dp"
                     android:layout_weight="0.6"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/brunch" />
+                    android:src="@drawable/dinner" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -198,7 +200,7 @@
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:paddingStart="15dp"
-                    android:text="brunch "
+                    android:text="dinner"
                     android:textAllCaps="true"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -227,10 +229,10 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="130dp"
                     android:layout_weight="0.6"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/brunch" />
+                    android:src="@drawable/snack" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -239,7 +241,7 @@
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:paddingStart="15dp"
-                    android:text="brunch "
+                    android:text="snacks"
                     android:textAllCaps="true"
                     android:textStyle="bold" />
             </LinearLayout>

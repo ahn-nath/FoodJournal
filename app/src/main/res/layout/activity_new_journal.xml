@@ -7,6 +7,12 @@
     android:padding="20dp"
     tools:context=".SingleJournalActivity">
 
+    <LinearLayout
+        android:id="@+id/layoutImageSet"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <Button
         android:id="@+id/button_choose_image"
         android:layout_width="wrap_content"
@@ -29,6 +35,8 @@
         android:layout_above="@+id/button_upload"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/edit_text_title"

@@ -26,9 +26,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:fontFamily="sans-serif-condensed"
-            android:hint="Username"
-            android:inputType="textPersonName" />
+            android:text="Username"
+      />
 
         <TextView
             android:id="@+id/profileEmail"
@@ -36,9 +37,9 @@
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
-            android:hint="E-mail"
-            android:layout_marginBottom="30dp"
-            android:inputType="textEmailAddress" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="Email"
+            android:layout_marginBottom="40dp" />
 
         <TextView
             android:id="@+id/profile_signOut"

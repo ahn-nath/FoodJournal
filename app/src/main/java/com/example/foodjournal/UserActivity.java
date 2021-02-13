@@ -50,11 +50,17 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(UserActivity.this, "All Journals", Toast.LENGTH_SHORT).show();
+
+                // send to My Journals activity
+                Intent intent = new Intent(getApplicationContext(), MyJournalsActivity.class);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), MyJournalsActivity.class));
             }
 
         });
     }
+
 
 
     // log out user

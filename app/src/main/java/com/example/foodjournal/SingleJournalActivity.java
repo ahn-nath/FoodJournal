@@ -18,6 +18,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,6 +26,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,8 +43,10 @@ import com.squareup.picasso.Picasso;
 public class SingleJournalActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
 
+    private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
     private DocumentReference docRef;
+    FirebaseUser currentUser;
     private StorageReference mStorageRef;
     private StorageTask mUploadTask;
 
@@ -51,9 +56,9 @@ public class SingleJournalActivity extends AppCompatActivity {
     private EditText editTextDescription;
     private NumberPicker numberPickerPriority;
     private Button mButtonChooseImage;
-    private Button mButtonUpload;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
+    private LinearLayout layoutImageSet;
 
     private Uri mImageUri;
 
@@ -63,6 +68,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_journal);
 
         // Firebase instances
+        mAuth = FirebaseAuth.getInstance();
         mStore = FirebaseFirestore.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference("uploads");
 
@@ -74,31 +80,45 @@ public class SingleJournalActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         numberPickerPriority = findViewById(R.id.number_picker_priority);
+        layoutImageSet = findViewById(R.id.layoutImageSet);
         mButtonChooseImage = findViewById(R.id.button_choose_image);
-        mButtonUpload = findViewById(R.id.button_upload);
         mImageView = findViewById(R.id.image_view);
         mProgressBar = findViewById(R.id.progress_bar);
 
-
-        // set NumberPicker values
-        String[] categories = { //shall this go here, don't think so
+        // set NumberPicker values [list]
+        String[] categoriesList = { //shall this go here, don't think so
                 "Brunch/Breakfast",
                 "Lunch",
                 "Dinner",
                 "Snack"
         };
+
+        //get extra intent from Main Activity to determine default values for picker
+        Intent intent = getIntent();
+        int category = intent.getIntExtra("category", -1);
+        String[] categories;
+
+        if (category == -1) {
+            //if the category of the journal was not specified [-1], show all
+            categories = categoriesList;
+        } else {
+            //if the category was specified, set default
+            categories = new String[1];
+            categories[0] = categoriesList[category-1       ];
+        }
+
         numberPickerPriority.setDisplayedValues(categories);
         numberPickerPriority.setMinValue(1);
-        numberPickerPriority.setMaxValue(4);
+        numberPickerPriority.setMaxValue(categories.length);
 
 
         //check if update or create new document
-        Intent intent = getIntent();
         String path = intent.getStringExtra("path");
 
         //if value different from empty get reference to document
         if (path != null) {
             setTitle("Update Journal");
+            layoutImageSet.setVisibility(View.GONE);
             update = true;
             docRef = mStore.document(path);
             getDocumentData(docRef);
@@ -135,6 +155,12 @@ public class SingleJournalActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        currentUser = mAuth.getCurrentUser();
     }
 
     // retrieve values from document if "update" is true
@@ -216,8 +242,9 @@ public class SingleJournalActivity extends AppCompatActivity {
                                     }
 
                                     // create new notebook
-                                    CollectionReference notebookRef = FirebaseFirestore.getInstance()
-                                            .collection("Journal");
+                                    CollectionReference notebookRef = mStore
+                                            .collection("Journal").document(currentUser.getUid()).collection("Journals");
+
                                     notebookRef.add(new Journal(imgUrl, title, description, priority, date));
                                 }
                             });
@@ -260,7 +287,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         int priority = numberPickerPriority.getValue();
 
         // check if image file was selected
-        if (mImageUri == null) {
+        if (mImageUri == null && !update) {
             Toast.makeText(this, "Please select image file", Toast.LENGTH_SHORT).show();
             return;
         }

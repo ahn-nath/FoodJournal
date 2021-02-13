@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "General";
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
+    FirebaseUser currentUser;
     private String userId;
     Button btnRegister;
     Button btnLogin;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     //if there's an user, redirect to UserActivity
     public void updateUI(FirebaseUser currentUser){
         if(currentUser != null){
-            startActivity(new Intent(this, HomeActivity.class));
+            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
             finish();
         }
     }
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         //if not empty, proceed to register or log in
         else {
         switch (view.getId()) {
+
             // register new user [button clicked]
             case R.id.btn_register:
 
@@ -98,14 +100,27 @@ public class MainActivity extends AppCompatActivity {
                                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
                                     //Create user and add custom fields to database
-
-                                    //Get reference to the collection in database and add values
                                     userId = mAuth.getCurrentUser().getUid();
                                     // get username part from email address
                                     int index = email.indexOf('@');
                                     String username = email.substring(0, index);
 
+                                    // Create Journal collection for user
+                                    DocumentReference docReference = mStore.collection("Journal").document(userId);
+                                    Map<String, Object> userJournal = new HashMap<>();
+                                    userJournal.put("email", email);
+                                    userJournal.put("username", username);
 
+                                    docReference.set(userJournal)
+                                            .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // trace error
+                                             Log.d("ERROR CREATING JOURNAL", task.getException().getMessage());
+                                        }
+                                    });
+
+                                    // Users collection
                                     DocumentReference documentReference = mStore.collection("Users").document(userId);
                                     Map<String, Object> user = new HashMap<>();
                                     user.put("email", email);

@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp">
@@ -11,22 +12,36 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_journal"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            app:cardCornerRadius="15dp"
+            android:layout_margin="5dp"
+          >
+
         <ImageView
             android:id="@+id/image_view_journal"
             android:layout_width="160dp"
             android:layout_height="160dp"
+            android:scaleType="centerCrop"
             android:layout_marginRight="15dp"
             android:background="#AFAFAF" />
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/image_view_journal"
+            android:layout_toRightOf="@id/card_journal"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
+            android:maxLines="2"
+            android:layout_marginLeft="15dp"
             android:text="Title"
+            android:textSize="20sp"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
@@ -34,7 +49,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_view_title"
-            android:layout_toRightOf="@id/image_view_journal"
+            android:layout_toRightOf="@id/card_journal"
+            android:layout_marginLeft="15dp"
             android:fontFamily="sans-serif-condensed"
             android:text="Description" />
 
@@ -43,9 +59,10 @@
             android:layout_width="wrap_content"
             android:textColor="@color/teal_200"
             android:textStyle="bold"
+            android:layout_marginLeft="15dp"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/image_view_journal"
-            android:layout_toRightOf="@id/image_view_journal"
+            android:layout_alignBottom="@id/card_journal"
+            android:layout_toRightOf="@id/card_journal"
             android:fontFamily="sans-serif-medium"
             android:text="DD/MM/YY" />
 

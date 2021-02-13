@@ -5,7 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,9 +16,12 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
+import static java.security.AccessController.getContext;
+
 
 public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAdapter.JournalHolder> {
     private OnItemClickListener listener;
+    private int count = -1;
 
     public JournalAdapter(FirestoreRecyclerOptions<Journal> options) {
         super(options);
@@ -35,9 +40,6 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
                 .fit()
                 .centerCrop()
                 .into(holder.imageViewJournal);
-
-
-
 
     }
 
@@ -60,7 +62,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
         TextView textViewDescription;
         TextView textViewDate;
         ImageView imageViewJournal;
-
+        LinearLayout emptyLayout;
 
         public JournalHolder(View itemView) {
             super(itemView);
@@ -69,6 +71,7 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
             textViewDescription = itemView.findViewById(R.id.text_view_description);
             textViewDate = itemView.findViewById(R.id.text_view_date);
             imageViewJournal = itemView.findViewById(R.id.image_view_journal);
+            emptyLayout = itemView.findViewById(R.id.emptyLayout);
 
             // set on click listener to get position of particular item
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -91,4 +94,5 @@ public class JournalAdapter extends FirestoreRecyclerAdapter<Journal, JournalAda
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
+
 }
