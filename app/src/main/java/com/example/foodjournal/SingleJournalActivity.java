@@ -109,9 +109,13 @@ public class SingleJournalActivity extends AppCompatActivity {
             categories[0] = categoriesList[category - 1];
         }
 
+        // if we received a default category, set minValue to it. Else, 1
+        int minValue = (category != -1) ? category: 1;
+        int maxValue = (category != -1) ? category: categoriesList.length;
+
         numberPickerPriority.setDisplayedValues(categories);
-        numberPickerPriority.setMinValue(1);
-        numberPickerPriority.setMaxValue(categories.length);
+        numberPickerPriority.setMinValue(minValue);
+        numberPickerPriority.setMaxValue(maxValue);
 
 
         //check if update or create new document
