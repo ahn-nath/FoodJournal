@@ -1,8 +1,12 @@
 package com.example.foodjournal;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,12 +19,13 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,20 +36,25 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 
 
 public class SingleJournalActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore mStore;
     private DocumentReference docRef;
     FirebaseUser currentUser;
     private StorageReference mStorageRef;
+    Bitmap photo;
 
-
+    boolean camera = false;
     boolean update = false;
     private EditText editTextTitle;
     private EditText editTextDescription;
@@ -65,14 +75,14 @@ public class SingleJournalActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference("uploads");
 
         // set header title
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Add Journal");
 
         // links elements to views
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         numberPickerPriority = findViewById(R.id.number_picker_priority);
-        LinearLayout layoutImageSet = findViewById(R.id.layoutImageSet);
+        RelativeLayout layoutImageSet = findViewById(R.id.layoutImageSet);
         Button mButtonChooseImage = findViewById(R.id.button_choose_image);
         mImageView = findViewById(R.id.image_view);
         mProgressBar = findViewById(R.id.progress_bar);
@@ -115,7 +125,6 @@ public class SingleJournalActivity extends AppCompatActivity {
             docRef = mStore.document(path);
             getDocumentData(docRef);
         }
-
 
         mButtonChooseImage.setOnClickListener(v -> openFileChooser());
 
@@ -165,6 +174,21 @@ public class SingleJournalActivity extends AppCompatActivity {
                 });
     }
 
+    // to take image
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void takeImage(View view) {
+        // if a permission to use the camera wasn't granted, send a request
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+        }
+
+        // if the permission was granted, open camera (new intent)
+        else {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
+    }
+
     // to pick image
     private void openFileChooser() {
         Intent intent = new Intent();
@@ -173,7 +197,21 @@ public class SingleJournalActivity extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    // set ImageView to picked image
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            } else {
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    // set ImageView to image picked/taken
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -186,6 +224,16 @@ public class SingleJournalActivity extends AppCompatActivity {
             mImageUri = data.getData();
             Picasso.get().load(mImageUri).into(mImageView);
         }
+
+        // if user took a photo with camera
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            camera = true;
+            //get data and set imageView to image
+            photo = (Bitmap) data.getExtras().get("data");
+            mImageView.setImageBitmap(photo);
+
+
+        }
     }
 
     // get extension file [image]
@@ -196,43 +244,76 @@ public class SingleJournalActivity extends AppCompatActivity {
     }
 
     private void uploadFile(String title, String description, int priority, String date) {
+        if (camera) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
-        StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                + "." + getFileExtension(mImageUri));
+            byte[] b = stream.toByteArray();
+            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis() + ".").child("testImg");
+            fileReference.putBytes(b)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // progress bar with delay
+                        Handler handler = new Handler();
+                        handler.postDelayed(() -> mProgressBar.setProgress(0), 500);
 
-        // progress bar with delay
-        // create new notebook
-        StorageTask mUploadTask = fileReference.putFile(mImageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // progress bar with delay
-                    Handler handler = new Handler();
-                    handler.postDelayed(() -> mProgressBar.setProgress(0), 500);
+                        fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String imgUrl = uri.toString();
+
+                            // create new notebook
+                            CollectionReference notebookRef = mStore
+                                    .collection("Journal").document(currentUser.getUid()).collection("Journals");
+
+                            notebookRef.add(new Journal(imgUrl, title, description, priority, date));
+
+                            // message
+                            Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
 
 
-                    fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String imgUrl = uri.toString();
-                        if (uri.toString() == null) {
-                            imgUrl = "it is null";
+                    }).addOnFailureListener(e -> Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show())
+                    .addOnProgressListener(taskSnapshot -> {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        mProgressBar.setProgress((int) progress);
 
-                        }
-
-                        // create new notebook
-                        CollectionReference notebookRef = mStore
-                                .collection("Journal").document(currentUser.getUid()).collection("Journals");
-
-                        notebookRef.add(new Journal(imgUrl, title, description, priority, date));
                     });
 
-                    Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
-                    finish();
+        } else {
+            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
 
-                })
-                .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show())
-                .addOnProgressListener(taskSnapshot -> {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    mProgressBar.setProgress((int) progress);
-                });
 
+            // progress bar with delay
+            // create new notebook
+            fileReference.putFile(mImageUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // progress bar with delay
+                        Handler handler = new Handler();
+                        handler.postDelayed(() -> mProgressBar.setProgress(0), 500);
+
+
+                        fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String imgUrl = uri.toString();
+
+                            // create new notebook
+                            CollectionReference notebookRef = mStore
+                                    .collection("Journal").document(currentUser.getUid()).collection("Journals");
+
+                            notebookRef.add(new Journal(imgUrl, title, description, priority, date));
+
+                            // message
+                            Toast.makeText(getApplicationContext(), "Journal added", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
+
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show())
+                    .addOnProgressListener(taskSnapshot -> {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        mProgressBar.setProgress((int) progress);
+                    });
+
+        }
     }
 
 
@@ -249,7 +330,7 @@ public class SingleJournalActivity extends AppCompatActivity {
         int priority = numberPickerPriority.getValue();
 
         // check if image file was selected
-        if (mImageUri == null && !update) {
+        if (((mImageUri == null && !camera) || (photo == null && camera)) && !update) {
             Toast.makeText(this, "Please select image file", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -273,4 +354,6 @@ public class SingleJournalActivity extends AppCompatActivity {
             uploadFile(title, description, priority, date);
         }
     }
+
+
 }
