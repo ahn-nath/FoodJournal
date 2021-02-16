@@ -28,9 +28,9 @@ Remember what you've been eating in the last few days and identify healthy and u
 
 The app uses different frameworks, languages, and tools to work properly. Main technologies:
 
-* [Android Studio] - HTML enhanced for web apps!
-* [Java] - awesome web-based text editor
-* [Firebase] - duh
+* [Android Studio] - the official IDE for Google's Android operating system
+* [Java] - object-oriented programming language
+* [Cloud Firestore] - flexible, scalable database from Firebase and Google Cloud
 
 ### Installation
 The Food Journal Tracker requires [Android Studio](https://developer.android.com/studio)  to run.
@@ -59,7 +59,7 @@ If you would like to know more about the project and its functionalities:
 
    [Android Studio]: <https://developer.android.com/studio>
    [Java]: <https://www.java.com/>
-   [Firebase]: <https://firebase.google.com/>
+   [Cloud Firestore]: <https://firebase.google.com/>
 
    [youtube-demo]: <https://www.youtube.com/watch?v=4Ho6JYXX9-Y&t=215s>
    [solution-challenge]: <https://www.codementor.io/project-solutions/bcyt4asqy9>
