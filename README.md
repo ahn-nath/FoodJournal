@@ -1,6 +1,9 @@
 # Food Journal Tracker
 ### _Track your eating habits, reflect today_
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
+
+![Featured image](./featured_.png)
+
+
 
 The _Food Journal Tracker_ app is an Android mobile application that can be used to capture photos and information about what you eat. Keeping track of the food you eat is a proven way to make better diet choices. As an added benefit, many popular mobile apps - including Instagram - work in a similar way to the food journaling app. 
 
