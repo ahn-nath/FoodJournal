@@ -24,7 +24,7 @@ Remember what you've been eating in the last few days and identify healthy and u
  **[J Acad Nutr Diet. 2016;116:1081-1086.]** 
 
 
-### Tech
+## Tech
 
 The app uses different frameworks, languages, and tools to work properly. Main technologies:
 
@@ -32,7 +32,7 @@ The app uses different frameworks, languages, and tools to work properly. Main t
 * [Java] - object-oriented programming language
 * [Cloud Firestore] - flexible, scalable database from Firebase and Google Cloud
 
-### Installation
+## Installation
 The Food Journal Tracker requires [Android Studio](https://developer.android.com/studio)  to run.
 
 Clone this repository and import into Android Studio.
@@ -42,7 +42,7 @@ https://github.com/ahn-nath/FoodJournal.git
 ```
 For more information on how to run the app on a real device or an emulator after importing it, follow this [tutorial](https://developer.android.com/training/basics/firstapp/running-app).
 
-### Adittional 
+## Adittional 
 
 If you would like to know more about the project and its functionalities:
 
